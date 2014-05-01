@@ -8,16 +8,16 @@ import android.graphics.Paint;
 import android.graphics.Paint.FontMetricsInt;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.widget.EditText;
 
 public class FloatingHintEditText extends EditText {
-    private static enum Animation { NONE, SHRINK, GROW };
-
-    private final static float HINT_SCALE = 0.6f;
-    private final static int ANIMATION_STEPS = 6;
+    private static enum Animation { NONE, SHRINK, GROW }
 
     private final Paint mSmallHintPaint = new Paint();
     private final ColorStateList mHintColors;
+    private final float mHintScale;
+    private final int mAnimationSteps;
 
     private boolean mWasEmpty;
     private int mAnimationFrame;
@@ -34,6 +34,11 @@ public class FloatingHintEditText extends EditText {
     public FloatingHintEditText(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
+        TypedValue typedValue = new TypedValue();
+        getResources().getValue(R.dimen.floatinghintedittext_hint_scale, typedValue, true);
+        mHintScale = typedValue.getFloat();
+        mAnimationSteps = getResources().getInteger(R.dimen.floatinghintedittext_animation_steps);
+
         mHintColors = getHintTextColors();
         mWasEmpty = TextUtils.isEmpty(getText());
     }
@@ -41,7 +46,7 @@ public class FloatingHintEditText extends EditText {
     @Override
     public int getCompoundPaddingTop() {
         final FontMetricsInt metrics = getPaint().getFontMetricsInt();
-        final int smallHintHeight = (int) ((metrics.bottom - metrics.top) * HINT_SCALE);
+        final int smallHintHeight = (int) ((metrics.bottom - metrics.top) * mHintScale);
         return super.getCompoundPaddingTop() + smallHintHeight;
     }
 
@@ -92,7 +97,7 @@ public class FloatingHintEditText extends EditText {
         final float largeHintPosY = getBaseline();
         final float smallHintPosY = largeHintPosY + getPaint().getFontMetricsInt().top;
         final float largeHintSize = getTextSize();
-        final float smallHintSize = largeHintSize * HINT_SCALE;
+        final float smallHintSize = largeHintSize * mHintScale;
 
         // If we're not animating, we're showing the fixed small hint, so draw it and bail.
         if (!isAnimating) {
@@ -109,7 +114,7 @@ public class FloatingHintEditText extends EditText {
 
         mAnimationFrame++;
 
-        if (mAnimationFrame == ANIMATION_STEPS) {
+        if (mAnimationFrame == mAnimationSteps) {
             if (mAnimation == Animation.GROW) {
                 setHintTextColor(mHintColors);
             }
@@ -128,7 +133,7 @@ public class FloatingHintEditText extends EditText {
     }
 
     private float lerp(float from, float to) {
-        final float alpha = (float) mAnimationFrame / (ANIMATION_STEPS - 1);
+        final float alpha = (float) mAnimationFrame / (mAnimationSteps - 1);
         return from * (1 - alpha) + to * alpha;
     }
 }
