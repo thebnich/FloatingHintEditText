@@ -15,12 +15,12 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="dynamicHintEditTextStyle">@style/Widget.DynamicHintEditText</item>
+        <item name="floatingHintEditTextStyle">@style/Widget.FloatingHintEditText</item>
     </style>
 
     <style name="Widget"></style>
 
-    <style name="Widget.DynamicHintEditText" parent="@android:style/Widget.EditText">
+    <style name="Widget.FloatingHintEditText" parent="@android:style/Widget.EditText">
         <item name="android:paddingTop">0dp</item>
     </style>
 

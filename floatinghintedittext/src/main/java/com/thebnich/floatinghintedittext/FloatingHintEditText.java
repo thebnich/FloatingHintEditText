@@ -1,4 +1,4 @@
-package com.thebnich.dynamichintedittext;
+package com.thebnich.floatinghintedittext;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -10,7 +10,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.EditText;
 
-public class DynamicHintEditText extends EditText {
+public class FloatingHintEditText extends EditText {
     private static enum Animation { NONE, SHRINK, GROW };
 
     private final static float HINT_SCALE = 0.6f;
@@ -23,15 +23,15 @@ public class DynamicHintEditText extends EditText {
     private int animationFrame;
     private Animation animation = Animation.NONE;
 
-    public DynamicHintEditText(Context context) {
+    public FloatingHintEditText(Context context) {
         this(context, null);
     }
 
-    public DynamicHintEditText(Context context, AttributeSet attrs) {
-        this(context, attrs, R.attr.dynamicHintEditTextStyle);
+    public FloatingHintEditText(Context context, AttributeSet attrs) {
+        this(context, attrs, R.attr.floatingHintEditTextStyle);
     }
 
-    public DynamicHintEditText(Context context, AttributeSet attrs, int defStyle) {
+    public FloatingHintEditText(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         hintColors = getHintTextColors();

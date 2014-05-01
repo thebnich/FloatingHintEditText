@@ -1,1 +1,1 @@
-include ':dynamichintedittext'
+include 'floatinghintedittext'
