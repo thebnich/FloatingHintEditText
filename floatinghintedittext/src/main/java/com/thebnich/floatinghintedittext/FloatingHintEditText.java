@@ -95,14 +95,14 @@ public class FloatingHintEditText extends EditText {
         mSmallHintPaint.setColor(mHintColors.getColorForState(getDrawableState(), mHintColors.getDefaultColor()));
 
         final float largeHintPosY = getBaseline();
-        final float smallHintPosY = largeHintPosY + getPaint().getFontMetricsInt().top;
+        final float smallHintPosY = largeHintPosY + getPaint().getFontMetricsInt().top + getScrollY();
         final float largeHintSize = getTextSize();
         final float smallHintSize = largeHintSize * mHintScale;
 
         // If we're not animating, we're showing the fixed small hint, so draw it and bail.
         if (!isAnimating) {
             mSmallHintPaint.setTextSize(smallHintSize);
-            canvas.drawText(getHint().toString(), getPaddingLeft(), smallHintPosY, mSmallHintPaint);
+            canvas.drawText(getHint().toString(), getCompoundPaddingLeft() + getScrollX(), smallHintPosY, mSmallHintPaint);
             return;
         }
 
