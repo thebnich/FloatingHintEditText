@@ -14,7 +14,7 @@ import android.widget.EditText;
 public class FloatingHintEditText extends EditText {
     private static enum Animation { NONE, SHRINK, GROW }
 
-    private final Paint mSmallHintPaint = new Paint();
+    private final Paint mFloatingHintPaint = new Paint();
     private final ColorStateList mHintColors;
     private final float mHintScale;
     private final int mAnimationSteps;
@@ -46,8 +46,8 @@ public class FloatingHintEditText extends EditText {
     @Override
     public int getCompoundPaddingTop() {
         final FontMetricsInt metrics = getPaint().getFontMetricsInt();
-        final int smallHintHeight = (int) ((metrics.bottom - metrics.top) * mHintScale);
-        return super.getCompoundPaddingTop() + smallHintHeight;
+        final int floatingHintHeight = (int) ((metrics.bottom - metrics.top) * mHintScale);
+        return super.getCompoundPaddingTop() + floatingHintHeight;
     }
 
     @Override
@@ -91,25 +91,29 @@ public class FloatingHintEditText extends EditText {
             return;
         }
 
-        mSmallHintPaint.set(getPaint());
-        mSmallHintPaint.setColor(mHintColors.getColorForState(getDrawableState(), mHintColors.getDefaultColor()));
+        mFloatingHintPaint.set(getPaint());
+        mFloatingHintPaint.setColor(
+                mHintColors.getColorForState(getDrawableState(), mHintColors.getDefaultColor()));
 
-        final float largeHintPosY = getBaseline();
-        final float smallHintPosY = largeHintPosY + getPaint().getFontMetricsInt().top + getScrollY();
-        final float largeHintSize = getTextSize();
-        final float smallHintSize = largeHintSize * mHintScale;
+        final float hintPosX = getCompoundPaddingLeft() + getScrollX();
+        final float normalHintPosY = getBaseline();
+        final float floatingHintPosY = normalHintPosY + getPaint().getFontMetricsInt().top + getScrollY();
+        final float normalHintSize = getTextSize();
+        final float floatingHintSize = normalHintSize * mHintScale;
 
-        // If we're not animating, we're showing the fixed small hint, so draw it and bail.
+        // If we're not animating, we're showing the floating hint, so draw it and bail.
         if (!isAnimating) {
-            mSmallHintPaint.setTextSize(smallHintSize);
-            canvas.drawText(getHint().toString(), getCompoundPaddingLeft() + getScrollX(), smallHintPosY, mSmallHintPaint);
+            mFloatingHintPaint.setTextSize(floatingHintSize);
+            canvas.drawText(getHint().toString(), hintPosX, floatingHintPosY, mFloatingHintPaint);
             return;
         }
 
         if (mAnimation == Animation.SHRINK) {
-            drawAnimationFrame(canvas, largeHintSize, smallHintSize, largeHintPosY, smallHintPosY);
+            drawAnimationFrame(canvas, normalHintSize, floatingHintSize,
+                    hintPosX, normalHintPosY, floatingHintPosY);
         } else {
-            drawAnimationFrame(canvas, smallHintSize, largeHintSize, smallHintPosY, largeHintPosY);
+            drawAnimationFrame(canvas, floatingHintSize, normalHintSize,
+                    hintPosX, floatingHintPosY, normalHintPosY);
         }
 
         mAnimationFrame++;
@@ -125,11 +129,12 @@ public class FloatingHintEditText extends EditText {
         invalidate();
     }
 
-    private void drawAnimationFrame(Canvas canvas, float fromSize, float toSize, float fromY, float toY) {
+    private void drawAnimationFrame(Canvas canvas, float fromSize, float toSize,
+                                     float hintPosX, float fromY, float toY) {
         final float textSize = lerp(fromSize, toSize);
         final float hintPosY = lerp(fromY, toY);
-        mSmallHintPaint.setTextSize(textSize);
-        canvas.drawText(getHint().toString(), getCompoundPaddingLeft(), hintPosY, mSmallHintPaint);
+        mFloatingHintPaint.setTextSize(textSize);
+        canvas.drawText(getHint().toString(), hintPosX, hintPosY, mFloatingHintPaint);
     }
 
     private float lerp(float from, float to) {
