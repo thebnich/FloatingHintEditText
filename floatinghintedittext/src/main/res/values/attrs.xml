@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="floatingHintEditTextStyle" format="reference" />
+    <declare-styleable name="FloatLabelView">
+        <attr name="dividePadding" format="dimension"/>
+        <attr name="hintScale" format="float"/>
+        <attr name="animationSteps" format="integer"/>
+    </declare-styleable>
 </resources>

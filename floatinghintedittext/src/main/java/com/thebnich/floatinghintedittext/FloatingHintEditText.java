@@ -2,6 +2,7 @@ package com.thebnich.floatinghintedittext;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -19,6 +20,10 @@ public class FloatingHintEditText extends EditText {
     public static final String ARG_SUPER_STATE = "arg_super_state";
     public static final String ARG_TEXT_CHANGED_STATE= "arg_text_changed_state";
 
+    private static final int DEFAULT_DIVIDE_PADDING = 5;
+    private static final int DEFAULT_ANIMATION_STEPS = 6;
+    private static final float DEFAULT_HINT_SCALE = 0.6f;
+
     private final Paint mFloatingHintPaint = new Paint();
     private final ColorStateList mHintColors;
     private final float mHintScale;
@@ -26,6 +31,7 @@ public class FloatingHintEditText extends EditText {
 
     private boolean mWasEmpty;
     private int mAnimationFrame;
+    private int mLabelPadding;
     private Animation mAnimation = Animation.NONE;
 
     public FloatingHintEditText(Context context) {
@@ -39,10 +45,16 @@ public class FloatingHintEditText extends EditText {
     public FloatingHintEditText(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        TypedValue typedValue = new TypedValue();
-        getResources().getValue(R.dimen.floatinghintedittext_hint_scale, typedValue, true);
-        mHintScale = typedValue.getFloat();
-        mAnimationSteps = getResources().getInteger(R.dimen.floatinghintedittext_animation_steps);
+        int defaultLabelPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DEFAULT_DIVIDE_PADDING, getResources().getDisplayMetrics());
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FloatLabelView);
+        try {
+            mLabelPadding = a.getDimensionPixelOffset(R.styleable.FloatLabelView_dividePadding, defaultLabelPadding);
+            mAnimationSteps = a.getInt(R.styleable.FloatLabelView_animationSteps, DEFAULT_ANIMATION_STEPS);
+            mHintScale = a.getFloat(R.styleable.FloatLabelView_hintScale, DEFAULT_HINT_SCALE);
+        } finally {
+            a.recycle();
+        }
 
         mHintColors = getHintTextColors();
         mWasEmpty = TextUtils.isEmpty(getText());
@@ -51,7 +63,7 @@ public class FloatingHintEditText extends EditText {
     @Override
     public int getCompoundPaddingTop() {
         final FontMetricsInt metrics = getPaint().getFontMetricsInt();
-        final int floatingHintHeight = (int) ((metrics.bottom - metrics.top) * mHintScale);
+        final int floatingHintHeight = (int) ((metrics.bottom - metrics.top) * mHintScale) + mLabelPadding;
         return super.getCompoundPaddingTop() + floatingHintHeight;
     }
 
@@ -102,7 +114,7 @@ public class FloatingHintEditText extends EditText {
 
         final float hintPosX = getCompoundPaddingLeft() + getScrollX();
         final float normalHintPosY = getBaseline();
-        final float floatingHintPosY = normalHintPosY + getPaint().getFontMetricsInt().top + getScrollY();
+        final float floatingHintPosY = normalHintPosY + getPaint().getFontMetricsInt().top + getScrollY() - mLabelPadding;
         final float normalHintSize = getTextSize();
         final float floatingHintSize = normalHintSize * mHintScale;
 
