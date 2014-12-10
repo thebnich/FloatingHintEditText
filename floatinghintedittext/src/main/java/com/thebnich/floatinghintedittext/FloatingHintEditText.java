@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetricsInt;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -13,6 +15,9 @@ import android.widget.EditText;
 
 public class FloatingHintEditText extends EditText {
     private static enum Animation { NONE, SHRINK, GROW }
+
+    public static final String ARG_SUPER_STATE = "arg_super_state";
+    public static final String ARG_TEXT_CHANGED_STATE= "arg_text_changed_state";
 
     private final Paint mFloatingHintPaint = new Paint();
     private final ColorStateList mHintColors;
@@ -130,7 +135,7 @@ public class FloatingHintEditText extends EditText {
     }
 
     private void drawAnimationFrame(Canvas canvas, float fromSize, float toSize,
-                                     float hintPosX, float fromY, float toY) {
+                                    float hintPosX, float fromY, float toY) {
         final float textSize = lerp(fromSize, toSize);
         final float hintPosY = lerp(fromY, toY);
         mFloatingHintPaint.setTextSize(textSize);
@@ -140,5 +145,20 @@ public class FloatingHintEditText extends EditText {
     private float lerp(float from, float to) {
         final float alpha = (float) mAnimationFrame / (mAnimationSteps - 1);
         return from * (1 - alpha) + to * alpha;
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ARG_SUPER_STATE, super.onSaveInstanceState());
+        bundle.putBoolean(ARG_TEXT_CHANGED_STATE, mWasEmpty);
+        return bundle;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        Bundle bundle = (Bundle) state;
+        mWasEmpty = bundle.getBoolean(ARG_SUPER_STATE);
+        super.onRestoreInstanceState(bundle.getParcelable(ARG_TEXT_CHANGED_STATE));
     }
 }
